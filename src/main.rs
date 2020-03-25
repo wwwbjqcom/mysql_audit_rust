@@ -95,9 +95,11 @@ fn main() {
             let mut cap = Capture::from_device(device).unwrap()
                 .promisc(true)
                 .snaplen(65535).open().unwrap();
+            let mut sfile = cap.savefile("aa.pcap").unwrap();
             while let Ok(packet) = cap.next() {
                 let host_info = HostInfo::new(packet.data);
                 if host_info.check_port(){
+                    sfile.write(&packet);
                     println!("time: {:?} source: {:?}   destination: {:?}  pro: {:?}",
                              &packet.header, &host_info.source.format_ip(&host_info.source_port),
                              &host_info.destination.format_ip(&host_info.destination_port), &host_info.pro);
