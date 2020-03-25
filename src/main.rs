@@ -90,7 +90,7 @@ impl HostInfo{
 fn main() {
     let devices = Device::list().unwrap();
     for device in devices{
-        if &device.name == &String::from("ens5"){
+        if &device.name == &String::from("eth0"){
             //let c = Device::from(device);
             let mut cap = Capture::from_device(device).unwrap()
                 .promisc(true)
@@ -98,7 +98,6 @@ fn main() {
             while let Ok(packet) = cap.next() {
                 let host_info = HostInfo::new(packet.data);
                 if host_info.check_port(){
-
                     println!("time: {:?} source: {:?}   destination: {:?}",
                              &packet.header, &host_info.source.format_ip(&host_info.source_port),
                              &host_info.destination.format_ip(&host_info.destination_port));
