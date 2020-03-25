@@ -98,9 +98,9 @@ fn main() {
             while let Ok(packet) = cap.next() {
                 let host_info = HostInfo::new(packet.data);
                 if host_info.check_port(){
-                    println!("time: {:?} source: {:?}   destination: {:?}",
+                    println!("time: {:?} source: {:?}   destination: {:?}  pro: {:?}",
                              &packet.header, &host_info.source.format_ip(&host_info.source_port),
-                             &host_info.destination.format_ip(&host_info.destination_port));
+                             &host_info.destination.format_ip(&host_info.destination_port), &host_info.pro);
                 }
             }
         }
