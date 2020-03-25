@@ -89,14 +89,17 @@ impl HostInfo{
 
 fn main() {
     let devices = Device::list().unwrap();
-    for device in devices{
+    'all: for device in devices{
         if &device.name == &String::from("eth0"){
             //let c = Device::from(device);
             let mut cap = Capture::from_device(device).unwrap()
                 .promisc(true)
                 .snaplen(65535).open().unwrap();
             let mut sfile = cap.savefile("aa.pcap").unwrap();
-            while let Ok(packet) = cap.next() {
+            'inner: while let Ok(packet) = cap.next() {
+                if packet.header.len <= 74{
+                    continue 'inner;
+                }
                 let host_info = HostInfo::new(packet.data);
                 if host_info.check_port(){
                     sfile.write(&packet);
