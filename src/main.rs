@@ -57,7 +57,7 @@ impl HostInfo{
         let destination = Ip::new(&mut cur);
         let source_port = cur.read_u16::<BigEndian>().unwrap();
         let destination_port = cur.read_u16::<BigEndian>().unwrap();
-        cur.seek(io::SeekFrom::Current(16)).unwrap();
+        cur.seek(io::SeekFrom::Current(28)).unwrap();
         let code = cur.read_u8().unwrap();
         let mut pro= protocol::ClientProtocol::new(code.clone());
 //        match pro{
