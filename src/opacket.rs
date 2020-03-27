@@ -348,10 +348,7 @@ impl AllSessionInfo{
     pub fn remove(&mut self, session_key: &String){
         self.aluino.remove(session_key);
     }
-
-    pub fn insert(&mut self, session_key: &String, session: &SessionInfo){
-        self.aluino.insert(session_key.parse().unwrap(), SessionInfo::from(session));
-    }
+    
 }
 
 
