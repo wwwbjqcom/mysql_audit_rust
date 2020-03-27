@@ -62,6 +62,7 @@ impl ServerProtocl{
         */
         session_info.server_response = ServerProtocl::HandshakePacket;
         session_info.connection_pre = true;
+        session_info.is_ok = true;
         session_info.end_time = host_info.ts.clone();
     }
 
