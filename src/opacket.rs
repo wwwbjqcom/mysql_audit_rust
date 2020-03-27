@@ -53,6 +53,7 @@ impl StreamType{
         match self{
             StreamType::Response => {
                 //响应包
+                let seq_id = cur.read_u8()?;
                 if !self.check_handshake_response(all_session, session_key, cur, host_info, conf)?{
                     match all_session.aluino.get(session_key){
                         Some(session) =>{
@@ -60,7 +61,7 @@ impl StreamType{
                             if session.connection_pre{
                                 session.session_unpacket(cur, &StreamType::Response, host_info)?;
                             }
-                            else if cur.read_u8()? == session.seq_id + 1{
+                            else if seq_id == session.seq_id + 1{
                                 session.session_unpacket(cur, &StreamType::Response, host_info)?;
                             };
                             //如果为连接建立， 需要多次来回，在这不删除，直到成功或失败

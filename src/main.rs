@@ -96,39 +96,7 @@ fn main() {
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
                 if host_info.check_port(&conf.port){
-                    if host_info.destination.format_ip() == "192.168.0.206".to_string(){
-                        cur.seek(io::SeekFrom::Current(32)).unwrap();
-                        let pro= ClientProtocol::new(&mut cur).unwrap();
-                        match pro{
-                            ClientProtocol::Null => {
-                                cur.seek(io::SeekFrom::Current(-1)).unwrap();
-                                let p = protocol::ServerProtocl::new(&mut cur).unwrap();
-                                println!("server:{:?}", p);
-                            }
-                            _ => {
-                                println!("client:{:?}", pro);
-                            }
-                        }
-                        println!("{:?}", &host_info);
-                    }
-                    else if host_info.source.format_ip() == "192.168.0.206".to_string(){
-                        cur.seek(io::SeekFrom::Current(32)).unwrap();
-                        let pro= ClientProtocol::new(&mut cur).unwrap();
-                        match pro{
-                            ClientProtocol::Null => {
-                                cur.seek(io::SeekFrom::Current(-1)).unwrap();
-                                let p = protocol::ServerProtocl::new(&mut cur).unwrap();
-                                println!("server:{:?}", p);
-                            }
-                            _ => {
-                                println!("client:{:?}", pro);
-                            }
-                        }
-                        println!("{:?}", &host_info);
-                    }
-
-
-                   // host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+                    host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                 }
             }
         }
