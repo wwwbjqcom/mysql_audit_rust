@@ -283,6 +283,7 @@ impl SessionInfo{
         match rtype{
             StreamType::Request =>{
                 let pro= ClientProtocol::new(cur)?;
+                println!("{:?}", &pro);
                 pro.client_pro_unpacket(cur, self)?;
             }
             StreamType::Response => {
@@ -348,7 +349,7 @@ impl AllSessionInfo{
     pub fn remove(&mut self, session_key: &String){
         self.aluino.remove(session_key);
     }
-    
+
 }
 
 
