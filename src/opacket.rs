@@ -109,6 +109,7 @@ impl StreamType{
             ServerProtocl::HandshakePacket => {
                 let mut new_session = SessionInfo::new(conf, &host_info, cur)?;
                 pro.server_pro_unpacket(cur, &mut new_session, host_info)?;
+                new_session.insert(all_session, session_key)?;
             }
             _ => {}
         }
