@@ -19,6 +19,7 @@ pub enum ServerProtocl{
 impl ServerProtocl{
     pub fn new(cur: &mut Cursor<&[u8]>) -> std::result::Result<ServerProtocl, Box<dyn Error>>{
         let code = cur.read_u8()?;
+        println!("server:{:?}",code);
         match code{
             0x00 => Ok(ServerProtocl::OKPacket),
             0xfe => Ok(ServerProtocl::EOFPacket),
