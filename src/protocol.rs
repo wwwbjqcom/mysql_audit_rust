@@ -4,6 +4,7 @@ use std::io::{Read, Seek, Cursor};
 use byteorder::ReadBytesExt;
 use std::io;
 use std;
+use crate::Tell;
 
 #[derive(Debug, Copy, Clone)]
 pub enum ServerProtocl{
@@ -223,7 +224,9 @@ impl ClientProtocol{
         string<EOF>	query	the text of the SQL query to execute
         */
         let mut tmp: Vec<u8> = vec![];
+        println!("{:?}", cur.tell());
         cur.read_exact(tmp.as_mut())?;
+        println!("{:?}", cur.tell());
         let a = String::from_utf8_lossy(&tmp).to_string();
         println!("{:?}", a);
         session_info.execute_sql = a;
