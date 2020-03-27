@@ -224,7 +224,9 @@ impl ClientProtocol{
         */
         let mut tmp: Vec<u8> = vec![];
         cur.read_exact(tmp.as_mut())?;
-        session_info.execute_sql = String::from_utf8_lossy(&tmp).to_string();
+        let a = String::from_utf8_lossy(&tmp).to_string();
+        println!("{:?}", a);
+        session_info.execute_sql = a;
         session_info.client_request = ClientProtocol::ComQuery;
         session_info.is_ok = true;
         Ok(())
