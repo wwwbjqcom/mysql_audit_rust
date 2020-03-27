@@ -154,20 +154,8 @@ pub enum ClientProtocol{
     ComQuery,
     ComQuit,
     ComInitDb,
-    ComFieldList,
-    ComPrefresh,
-    ComStatistics,
-    ComProcessInfo,
     ComProcessKill,
-    ComDebug,
-    ComPing,
-    ComChangeUser,
-    ComResetConnection,
-    ComSetOption,
     ComStmtPrepare,
-    ComStmtExecute,
-    ComStmtClose,
-    ComStmtSendLongData,
     Null
 }
 impl ClientProtocol{
@@ -177,20 +165,8 @@ impl ClientProtocol{
             0x03 => Ok(ClientProtocol::ComQuery),
             0x01 => Ok(ClientProtocol::ComQuit),
             0x02 => Ok(ClientProtocol::ComInitDb),
-            0x04 => Ok(ClientProtocol::ComFieldList),
-            0x07 => Ok(ClientProtocol::ComPrefresh),
-            0x08 => Ok(ClientProtocol::ComStatistics),
-            0x0A => Ok(ClientProtocol::ComProcessInfo),
             0x0C => Ok(ClientProtocol::ComProcessKill),
-            0x0D => Ok(ClientProtocol::ComDebug),
-            0x0E => Ok(ClientProtocol::ComPing),
-            0x11 => Ok(ClientProtocol::ComChangeUser),
-            0x1F => Ok(ClientProtocol::ComResetConnection),
-            0x1A => Ok(ClientProtocol::ComSetOption),
             0x16 => Ok(ClientProtocol::ComStmtPrepare),
-            0x17 => Ok(ClientProtocol::ComStmtExecute),
-            0x19 => Ok(ClientProtocol::ComStmtClose),
-            0x18 => Ok(ClientProtocol::ComStmtSendLongData),
             _ => Ok(ClientProtocol::Null)
         }
 
