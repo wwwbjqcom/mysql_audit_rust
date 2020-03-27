@@ -116,6 +116,7 @@ impl StreamType{
             }
             _ => {}
         }
+        cur.seek(io::SeekFrom::Current(-1))?;
         Ok(false)
     }
 }
