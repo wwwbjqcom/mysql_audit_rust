@@ -109,8 +109,9 @@ fn main() {
                                 println!("client:{:?}", pro);
                             }
                         }
+                        println!("{:?}", &host_info);
                     }
-                    if host_info.source.format_ip() == "192.168.0.206".to_string(){
+                    else if host_info.source.format_ip() == "192.168.0.206".to_string(){
                         cur.seek(io::SeekFrom::Current(32)).unwrap();
                         let pro= ClientProtocol::new(&mut cur).unwrap();
                         match pro{
@@ -123,9 +124,10 @@ fn main() {
                                 println!("client:{:?}", pro);
                             }
                         }
+                        println!("{:?}", &host_info);
                     }
 
-                    println!("{:?}", &host_info);
+
                    // host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                 }
             }
