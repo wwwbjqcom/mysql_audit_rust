@@ -84,10 +84,9 @@ impl StreamType{
                             new_session.session_unpacket(cur, &StreamType::Request, host_info)?;
                             new_session.insert(all_session, session_key)?;
                         }else {
-                            if !session.unpacket_handshake_response(cur)?{
-                                let new_session = session.replace(host_info, cur, &StreamType::Request)?;
-                                new_session.insert(all_session, session_key)?;
-                            }
+                            session.unpacket_handshake_response(cur)?;
+                            //let new_session = session.replace(host_info, cur, &StreamType::Request)?;
+                            new_session.insert(all_session, session_key)?;
                         }
 
                         return Ok(());
@@ -333,7 +332,7 @@ impl SessionInfo{
     ///
     /// 操作client创建链接时回的handshake包， 从中获取user_name
     /// 如果数据包id不为顺序表示存在问题，返回false，替换该session
-    fn unpacket_handshake_response(&mut self, cur: &mut Cursor<&[u8]>) -> std::result::Result<bool, Box<dyn Error>>{
+    fn unpacket_handshake_response(&mut self, cur: &mut Cursor<&[u8]>) -> std::result::Result<(), Box<dyn Error>>{
         let seq_id = cur.read_u8()?;
         if seq_id == self.seq_id + 1{
             cur.seek(io::SeekFrom::Current(32))?;
@@ -348,9 +347,8 @@ impl SessionInfo{
             }
             let user_name = from_utf8(user_name_packet.as_ref())?;
             self.user_name = user_name.parse()?;
-            return Ok(true);
         }
-        return Ok(false);
+        Ok(())
     }
 
     fn insert(&self, all_session_info: &mut AllSessionInfo, session_key: &String) -> std::result::Result<(), Box<dyn Error>> {
