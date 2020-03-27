@@ -167,7 +167,7 @@ impl HostInfo{
             session_key = format!("{}:{}", self.destination.format_ip(), self.destination_port.clone());
             self.rtype = StreamType::Response;
         }
-        println!("{:?}", &session_key);
+        println!("src: {:?}", &session_key);
         self.rtype.streamtype_unpacket(all_session, &session_key, cur, &self, conf)?;
         Ok(())
     }
@@ -183,7 +183,7 @@ impl HostInfo{
             session_key = format!("{}:{}", self.destination.format_ip(), self.destination_port.clone());
             self.rtype = StreamType::Response;
         }
-        println!("{:?}", &session_key);
+        println!("des: {:?}", &session_key);
         self.rtype.streamtype_unpacket(all_session, &session_key, cur, &self, conf)?;
         Ok(())
     }
