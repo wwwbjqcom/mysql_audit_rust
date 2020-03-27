@@ -98,7 +98,17 @@ fn main() {
                 if host_info.check_port(&conf.port){
                     cur.seek(io::SeekFrom::Current(32)).unwrap();
                     let pro= ClientProtocol::new(&mut cur).unwrap();
-                    println!("{:?}", pro);
+                    match pro{
+                        ClientProtocol::Null => {
+                            cur.seek(io::SeekFrom::Current(-1)).unwrap();
+                            let p = protocol::ServerProtocl::new(&mut cur).unwrap();
+                            println!("server:{:?}", p);
+                        }
+                        _ => {
+                            println!("client:{:?}", pro);
+                        }
+                    }
+
                     //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                 }
             }
