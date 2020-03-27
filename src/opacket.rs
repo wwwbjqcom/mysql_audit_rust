@@ -89,7 +89,7 @@ impl StreamType{
                         return Ok(());
                     }
                     None => {
-                        let mut new_session = SessionInfo::new(conf, &host_info.ts, cur)?;
+                        let mut new_session = SessionInfo::new(conf, &host_info, cur)?;
                         new_session.session_unpacket(cur, &StreamType::Request, host_info)?;
                         new_session.insert(all_session, session_key)?;
                     }
@@ -127,6 +127,27 @@ impl HostInfo{
             destination_port,
             ts: ts.clone(),
             rtype: StreamType::Null
+        }
+    }
+
+    ///
+    /// 判断包的session， 返回分别为源ip port 目标ip 端口
+    pub fn get_source_destination_info(&self, conf: &Config) -> (String, u16, String, u16){
+        let des_ip = self.destination.format_ip();
+        let src_ip = self.source.format_ip();
+        if conf.dtype == "src".to_string(){
+            if conf.host == des_ip{
+                return (des_ip, self.destination_port.clone(), src_ip, self.source_port.clone());
+            }else {
+                return (src_ip, self.source_port.clone(), des_ip, self.destination_port.clone());
+            }
+        }else {
+            if conf.host == des_ip{
+                return (src_ip, self.source_port.clone(), des_ip, self.destination_port.clone());
+            }
+            else {
+                return (des_ip, self.destination_port.clone(), src_ip, self.source_port.clone());
+            }
         }
     }
 
@@ -228,19 +249,13 @@ pub struct SessionInfo{
 }
 
 impl SessionInfo{
-    pub fn new(conf: &Config, ts: &UnixTime, cur: &mut Cursor<&[u8]>) -> Result<SessionInfo, Box<dyn Error>>{
-        let mut source = "".to_string();
-        let mut destination = conf.host.clone();
-        let destination_port = conf.port.clone();
-        if &conf.dtype == &String::from("src"){
-            source = conf.host.clone();
-            destination = "".to_string();
-        }
+    pub fn new(conf: &Config, host_info: &HostInfo, cur: &mut Cursor<&[u8]>) -> Result<SessionInfo, Box<dyn Error>>{
+        let (source, source_port, destination, destination_port) = host_info.get_source_destination_info(conf);
         let seq_id = cur.read_u8()?;
         Ok(SessionInfo{
             source,
             destination,
-            source_port: 0,
+            source_port,
             destination_port,
             client_request: ClientProtocol::Null,
             server_response: ServerProtocl::TextResult,
