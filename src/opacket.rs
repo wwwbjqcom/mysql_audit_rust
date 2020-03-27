@@ -53,8 +53,8 @@ impl StreamType{
         match self{
             StreamType::Response => {
                 //响应包
-                let seq_id = cur.read_u8()?;
                 if !self.check_handshake_response(all_session, session_key, cur, host_info, conf)?{
+                    let seq_id = cur.read_u8()?;
                     match all_session.aluino.get(session_key){
                         Some(session) =>{
                             let mut session = session.clone();
