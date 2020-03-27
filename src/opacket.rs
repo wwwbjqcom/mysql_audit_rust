@@ -76,7 +76,8 @@ impl StreamType{
                     Some(session) => {
                         let mut session = session.clone();
                         if !session.connection_pre{
-                            let new_session = session.replace(host_info, cur, &StreamType::Request)?;
+                            let mut new_session = session.replace(host_info, cur, &StreamType::Request)?;
+                            new_session.session_unpacket(cur, &StreamType::Request, host_info)?;
                             new_session.insert(all_session, session_key)?;
                         }else {
                             if !session.unpacket_handshake_response(cur)?{
@@ -90,6 +91,7 @@ impl StreamType{
                     None => {
                         let mut new_session = SessionInfo::new(conf, &host_info.ts, cur)?;
                         new_session.session_unpacket(cur, &StreamType::Request, host_info)?;
+                        new_session.insert(all_session, session_key)?;
                     }
                 }
             },
@@ -221,7 +223,7 @@ pub struct SessionInfo{
     pub seq_id: u8,
     pub start_time: UnixTime,
     pub end_time: UnixTime,
-    pub is_ok: bool,        //是否为需要的包， 不需要的会删除
+    pub is_ok: bool,        //是否为需要的包， 不需要的不会插入
 }
 
 impl SessionInfo{
@@ -345,6 +347,10 @@ impl AllSessionInfo{
 
     pub fn remove(&mut self, session_key: &String){
         self.aluino.remove(session_key);
+    }
+
+    pub fn insert(&mut self, session_key: &String, session: &SessionInfo){
+        self.aluino.insert(session_key.parse().unwrap(), SessionInfo::from(session));
     }
 }
 
