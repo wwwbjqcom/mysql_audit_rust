@@ -1,9 +1,10 @@
-use pcap::{Device,Capture, Savefile};
-use std::io::{Read, Seek, SeekFrom, Result, Cursor};
-use std::io;
-use std::{thread, time};
-use byteorder::{ReadBytesExt, LittleEndian, BigEndian};
+use pcap::{Device, Capture};
+use structopt::StructOpt;
 mod protocol;
+mod opacket;
+
+use std::io::{Seek, SeekFrom, Result, Cursor};
+
 
 
 
@@ -15,97 +16,90 @@ pub trait Tell: Seek {
 
 impl<T> Tell for T where T: Seek { }
 
-#[derive(Debug, Clone)]
-struct Ip{
-    ip_first: u8,
-    ip_two: u8,
-    ip_three: u8,
-    ip_four: u8
-}
-impl Ip{
-    fn new<R: Read+Seek>(cur: &mut R) -> Ip{
-        let ip_first = cur.read_u8().unwrap();
-        let ip_two = cur.read_u8().unwrap();
-        let ip_three = cur.read_u8().unwrap();
-        let ip_four = cur.read_u8().unwrap();
-        Ip {
-            ip_first,
-            ip_two,
-            ip_three,
-            ip_four
-        }
-    }
+#[derive(Debug, StructOpt)]
+#[structopt(name = "example", about = "An example of StructOpt usage.")]
+pub struct Opt {
+    #[structopt(long = "host", short= "h", help="本机地址, 默认127.0.0.1")]
+    pub host: Option<String>,
 
-    fn format_ip(&self, port: &u16) -> String{
-        format!("{}.{}.{}.{}:{}", self.ip_first.clone(), self.ip_two.clone(), self.ip_three.clone(),self.ip_four.clone(), port.clone())
-    }
+    #[structopt(long = "dtype", short= "t", help="本机所属方向(发送方/接受方), 可佩src/des, 默认des")]
+    pub dtype: Option<String>,
+
+    #[structopt(long = "port", short= "p", help="监听那个端口的数据流，默认所有")]
+    pub port: Option<String>,
+
+    #[structopt(long = "ethernet", short= "e", help="监听的网卡，默认eth0")]
+    pub ethernet: Option<String>,
+
 }
 
 #[derive(Debug, Clone)]
-struct HostInfo{
-    source: Ip,
-    destination: Ip,
-    source_port: u16,
-    destination_port: u16,
-    pro: protocol::ClientProtocol
+pub struct Config {
+    pub host: String,
+    pub dtype: String,
+    pub ethernet: String,
+    pub port: u16,
 }
-impl HostInfo{
-    fn new(data: &[u8]) -> HostInfo{
-        let mut cur = Cursor::new(data);
-        cur.seek(io::SeekFrom::Current(26)).unwrap();
-        let source = Ip::new(&mut cur);
-        let destination = Ip::new(&mut cur);
-        let source_port = cur.read_u16::<BigEndian>().unwrap();
-        let destination_port = cur.read_u16::<BigEndian>().unwrap();
-        cur.seek(io::SeekFrom::Current(28)).unwrap();
-        let code = cur.read_u8().unwrap();
-        let mut pro= protocol::ClientProtocol::new(code.clone());
-//        match pro{
-//            protocol::ClientProtocol::Null => {
-//                pro = protocol::ServerProtocl::new(code);
-//            }
-//            _ =>{}
-//        }
-        HostInfo{
-            source,
-            destination,
-            source_port,
-            destination_port,
-            pro
-        }
-    }
 
-    fn check_port(&self) -> bool{
-        //println!("{:?}, {:?}", &self.source_port, &self.destination_port);
-        if self.source_port == 3306{
-            return true;
-        }else if self.destination_port == 3306{
-            return true;
-        }else{
-            return false;
+impl Config{
+    pub fn new(args: Opt) -> Config {
+        let mut host = String::from("127.0.0.1");
+        let mut dtype = String::from("des");
+        let mut ethernet = String::from("eth0");
+        let mut port : u16 = 0;
+
+        match args.host {
+            Some(t) => host = t,
+            _ => {}
+        }
+
+        match args.dtype {
+            Some(t) => dtype = t,
+            _ => {}
+        }
+
+        match args.port {
+            Some(t) => {port = t.parse().unwrap()}
+            _ => {}
+        }
+
+        match args.ethernet {
+            Some(t) => ethernet = t,
+            _ => {}
+        }
+
+        Config{
+            host,
+            dtype,
+            port,
+            ethernet
         }
     }
 }
 
 fn main() {
+    let args = Opt::from_args();
+    let conf = Config::new(args);
+    let mut all_session_info = opacket::AllSessionInfo::new();
     let devices = Device::list().unwrap();
     'all: for device in devices{
-        if &device.name == &String::from("eth0"){
-            //let c = Device::from(device);
+        if &device.name == &conf.ethernet {
             let mut cap = Capture::from_device(device).unwrap()
                 .promisc(true)
                 .snaplen(65535).open().unwrap();
-            let mut sfile = cap.savefile("aa.pcap").unwrap();
             'inner: while let Ok(packet) = cap.next() {
                 if packet.header.len <= 74{
                     continue 'inner;
                 }
-                let host_info = HostInfo::new(packet.data);
-                if host_info.check_port(){
-                    sfile.write(&packet);
-                    println!("time: {:?} source: {:?}   destination: {:?}  pro: {:?}",
-                             &packet.header, &host_info.source.format_ip(&host_info.source_port),
-                             &host_info.destination.format_ip(&host_info.destination_port), &host_info.pro);
+                let mut cur = Cursor::new(packet.data);
+                //let a= packet.header.ts.tv_sec;
+                let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
+                let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
+                if host_info.check_port(&conf.port){
+                    host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+                    println!("time: {:?} source: {:?}   destination: {:?}",
+                             &packet.header, &host_info.source.format_ip(),
+                             &host_info.destination.format_ip());
                 }
             }
         }
