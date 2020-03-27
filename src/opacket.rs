@@ -53,22 +53,23 @@ impl StreamType{
         match self{
             StreamType::Response => {
                 //响应包
-                match all_session.aluino.get(session_key){
-                    Some(session) =>{
-                        let mut session = session.clone();
-                        if session.connection_pre{
-                            session.session_unpacket(cur, &StreamType::Response, host_info)?;
+                if !self.check_handshake_response(all_session, session_key, cur, host_info, conf)?{
+                    match all_session.aluino.get(session_key){
+                        Some(session) =>{
+                            let mut session = session.clone();
+                            if session.connection_pre{
+                                session.session_unpacket(cur, &StreamType::Response, host_info)?;
+                            }
+                            else if cur.read_u8()? == session.seq_id + 1{
+                                session.session_unpacket(cur, &StreamType::Response, host_info)?;
+                            };
+                            //如果为连接建立， 需要多次来回，在这不删除，直到成功或失败
+                            if !session.connection_pre{
+                                all_session.remove(session_key);
+                            }
                         }
-                        else if cur.read_u8()? == session.seq_id + 1{
-                            session.session_unpacket(cur, &StreamType::Response, host_info)?;
-                        };
-                        //如果为连接建立， 需要多次来回，在这不删除，直到成功或失败
-                        if !session.connection_pre{
-                            all_session.remove(session_key);
+                        _ =>{
                         }
-                    }
-                    _ =>{
-                        self.check_handshake_response(all_session, session_key, cur, host_info, conf)?;
                     }
                 }
             },
@@ -103,17 +104,18 @@ impl StreamType{
     }
 
 
-    fn check_handshake_response(&self, all_session: &mut AllSessionInfo, session_key: &String, cur: &mut Cursor<&[u8]>, host_info: &HostInfo, conf: &Config) -> Result<(), Box<dyn Error>>{
+    fn check_handshake_response(&self, all_session: &mut AllSessionInfo, session_key: &String, cur: &mut Cursor<&[u8]>, host_info: &HostInfo, conf: &Config) -> Result<bool, Box<dyn Error>>{
         let pro= ServerProtocl::new(cur)?;
         match pro{
             ServerProtocl::HandshakePacket => {
                 let mut new_session = SessionInfo::new(conf, &host_info, cur)?;
                 pro.server_pro_unpacket(cur, &mut new_session, host_info)?;
                 new_session.insert(all_session, session_key)?;
+                return Ok(true)
             }
             _ => {}
         }
-        Ok(())
+        Ok(false)
     }
 }
 
