@@ -343,7 +343,7 @@ impl SessionInfo{
     ///
     /// 输出信息
     pub fn out_info(&self) {
-        println!("{:?}", self);
+        //println!("{:?}", self);
     }
 }
 
