@@ -102,7 +102,7 @@ impl StreamType{
 ///
 /// 数据包中解析出的源/目的ip和端口信息
 ///
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct HostInfo{
     pub source: Ip,
     pub destination: Ip,
