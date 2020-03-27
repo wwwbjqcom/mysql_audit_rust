@@ -334,6 +334,7 @@ impl SessionInfo{
 /// 记录所有客户端操作流程信息， 已源ip:port作为唯一键
 /// 一个会话操作结束会删除对应信息
 ///
+#[derive(Debug)]
 pub struct AllSessionInfo {
     pub aluino: HashMap<String, SessionInfo>
 }
