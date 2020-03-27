@@ -4,8 +4,8 @@ mod protocol;
 mod opacket;
 
 use std::io::{Seek, SeekFrom, Result, Cursor};
-
-
+use std::io;
+use crate::protocol::ClientProtocol;
 
 
 pub trait Tell: Seek {
@@ -96,7 +96,10 @@ fn main() {
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
                 if host_info.check_port(&conf.port){
-                    host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+                    cur.seek(io::SeekFrom::Current(32)).unwrap();
+                    let pro= ClientProtocol::new(&mut cur).unwrap();
+                    println!("{:?}", pro);
+                    //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                 }
             }
         }
