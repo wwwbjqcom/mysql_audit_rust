@@ -224,12 +224,8 @@ impl ClientProtocol{
         string<EOF>	query	the text of the SQL query to execute
         */
         let mut tmp: Vec<u8> = vec![];
-        println!("{:?}", cur.tell());
-        cur.read_exact(tmp.as_mut())?;
-        println!("{:?}", cur.tell());
-        let a = String::from_utf8_lossy(&tmp).to_string();
-        println!("{:?}", a);
-        session_info.execute_sql = a;
+        cur.read_to_end(tmp.as_mut())?;
+        session_info.execute_sql = String::from_utf8_lossy(&tmp).to_string();
         session_info.client_request = ClientProtocol::ComQuery;
         session_info.is_ok = true;
         Ok(())
