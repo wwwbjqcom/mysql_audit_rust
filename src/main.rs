@@ -97,6 +97,7 @@ fn main() {
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
                 if host_info.check_port(&conf.port){
                     host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+                    println!("{:?}", &all_session_info);
                 }
             }
         }
