@@ -49,7 +49,7 @@ pub enum StreamType{
 }
 impl StreamType{
     pub fn streamtype_unpacket(&self, all_session: &mut AllSessionInfo, session_key: &String, cur: &mut Cursor<&[u8]>, host_info: &HostInfo, conf: &Config) -> std::result::Result<(), Box<dyn Error>>{
-        cur.seek(io::SeekFrom::Current(27))?;   //跳过网络层协议包内容及mysql协议前3字节payload的部分
+        cur.seek(io::SeekFrom::Current(31))?;   //跳过网络层协议包内容及mysql协议前3字节payload的部分
         match self{
             StreamType::Response => {
                 //响应包
