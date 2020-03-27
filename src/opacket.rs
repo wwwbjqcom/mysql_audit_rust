@@ -365,6 +365,7 @@ impl SessionInfo{
 
 ///
 /// 存放每个连接与用户的对应关系
+#[derive(Debug)]
 pub struct Connection{
     pub host: String,
     pub port: u16,
@@ -378,7 +379,7 @@ pub struct Connection{
 #[derive(Debug)]
 pub struct AllSessionInfo {
     pub aluino: HashMap<String, SessionInfo>,
-    pub connections: HashMap<StreamType, Connection>
+    pub connections: HashMap<String, Connection>
 }
 impl AllSessionInfo{
     pub fn new() -> AllSessionInfo{
