@@ -167,7 +167,6 @@ impl HostInfo{
             session_key = format!("{}:{}", self.destination.format_ip(), self.destination_port.clone());
             self.rtype = StreamType::Response;
         }
-        println!("src: {:?}", &session_key);
         self.rtype.streamtype_unpacket(all_session, &session_key, cur, &self, conf)?;
         Ok(())
     }
@@ -176,15 +175,13 @@ impl HostInfo{
     /// 监听模式为des的情况， 即本机为目标
     fn check_des(&mut self,conf: &Config, all_session: &mut AllSessionInfo, cur: &mut Cursor<&[u8]>) -> std::result::Result<(), Box<dyn Error>>{
         let mut session_key = String::from("");
-        let a = self.destination.format_ip();
-        if a == conf.host{
+        if self.destination.format_ip() == conf.host{
             session_key = format!("{}:{}", self.source.format_ip(), self.source_port.clone());
             self.rtype = StreamType::Request;
         }else {
             session_key = format!("{}:{}", self.destination.format_ip(), self.destination_port.clone());
             self.rtype = StreamType::Response;
         }
-        println!("des: {:?}   {:?}, {:?}", &session_key, &a, &conf.host);
         self.rtype.streamtype_unpacket(all_session, &session_key, cur, &self, conf)?;
         Ok(())
     }
