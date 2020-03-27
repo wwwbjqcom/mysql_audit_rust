@@ -67,7 +67,9 @@ impl StreamType{
                             all_session.remove(session_key);
                         }
                     }
-                    _ =>{}
+                    _ =>{
+                        self.check_handshake_response(all_session, session_key, cur, host_info, conf)?;
+                    }
                 }
             },
             StreamType::Request => {
@@ -96,6 +98,19 @@ impl StreamType{
                 }
             },
             StreamType::Null =>{}
+        }
+        Ok(())
+    }
+
+
+    fn check_handshake_response(&self, all_session: &mut AllSessionInfo, session_key: &String, cur: &mut Cursor<&[u8]>, host_info: &HostInfo, conf: &Config) -> Result<(), Box<dyn Error>>{
+        let pro= ServerProtocl::new(cur)?;
+        match pro{
+            ServerProtocl::HandshakePacket => {
+                let mut new_session = SessionInfo::new(conf, &host_info, cur)?;
+                pro.server_pro_unpacket(cur, &mut new_session, host_info)?;
+            }
+            _ => {}
         }
         Ok(())
     }
@@ -314,7 +329,6 @@ impl SessionInfo{
     /// 操作client创建链接时回的handshake包， 从中获取user_name
     /// 如果数据包id不为顺序表示存在问题，返回false，替换该session
     fn unpacket_handshake_response(&mut self, cur: &mut Cursor<&[u8]>) -> std::result::Result<bool, Box<dyn Error>>{
-        cur.seek(io::SeekFrom::Current(27))?;
         let seq_id = cur.read_u8()?;
         if seq_id == self.seq_id + 1{
             cur.seek(io::SeekFrom::Current(32))?;
@@ -347,17 +361,28 @@ impl SessionInfo{
     }
 }
 
+
+
+///
+/// 存放每个连接与用户的对应关系
+pub struct Connection{
+    pub host: String,
+    pub port: u16,
+    pub user_name: String
+}
+
 ///
 /// 记录所有客户端操作流程信息， 已源ip:port作为唯一键
 /// 一个会话操作结束会删除对应信息
 ///
 #[derive(Debug)]
 pub struct AllSessionInfo {
-    pub aluino: HashMap<String, SessionInfo>
+    pub aluino: HashMap<String, SessionInfo>,
+    pub connections: HashMap<StreamType, Connection>
 }
 impl AllSessionInfo{
     pub fn new() -> AllSessionInfo{
-        AllSessionInfo{ aluino: HashMap::new()}
+        AllSessionInfo{ aluino: HashMap::new(), connections: HashMap::new() }
     }
 
     pub fn remove(&mut self, session_key: &String){
