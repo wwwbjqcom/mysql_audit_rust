@@ -86,7 +86,7 @@ impl StreamType{
                         }else {
                             session.unpacket_handshake_response(cur)?;
                             //let new_session = session.replace(host_info, cur, &StreamType::Request)?;
-                            new_session.insert(all_session, session_key)?;
+                            session.insert(all_session, session_key)?;
                         }
 
                         return Ok(());
