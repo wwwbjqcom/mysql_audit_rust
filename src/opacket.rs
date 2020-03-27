@@ -264,7 +264,7 @@ impl SessionInfo{
             response_value: "".to_string(),
             connection_pre: false,
             seq_id,
-            start_time: ts.clone(),
+            start_time: host_info.ts.clone(),
             end_time: UnixTime{ tv_sec: 0, tv_usec: 0 },
             is_ok: false
         })
