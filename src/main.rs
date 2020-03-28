@@ -6,6 +6,7 @@ mod opacket;
 use std::io::{Seek, SeekFrom, Result, Cursor};
 use std::io;
 use crate::protocol::ClientProtocol;
+use byteorder::ReadBytesExt;
 
 
 pub trait Tell: Seek {
@@ -98,6 +99,8 @@ fn main() {
                 if host_info.check_port(&conf.port){
                     //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                     println!("{:?}", host_info);
+                    cur.seek(io::SeekFrom::Current(31))?;
+                    println!("code:{}", cur.read_u8().unwrap());
                 }
             }
         }
