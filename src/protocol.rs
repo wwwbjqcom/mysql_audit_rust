@@ -161,7 +161,6 @@ pub enum ClientProtocol{
 impl ClientProtocol{
     pub fn new(cur: &mut Cursor<&[u8]>) -> std::result::Result<ClientProtocol, Box<dyn Error>>{
         let code = cur.read_u8()?;
-        println!("{:?}",code);
         match code {
             0x03 => Ok(ClientProtocol::ComQuery),
             0x01 => Ok(ClientProtocol::ComQuit),
