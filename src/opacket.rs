@@ -80,7 +80,6 @@ impl StreamType{
                     Some(session) => {
                         let mut session = session.clone();
                         if session.connection_pre{
-                            println!("aaaaa");
                             session.unpacket_handshake_response(cur)?;
                             //let new_session = session.replace(host_info, cur, &StreamType::Request)?;
                             session.insert(all_session, session_key)?;
@@ -333,8 +332,8 @@ impl SessionInfo{
     /// 操作client创建链接时回的handshake包， 从中获取user_name
     /// 如果数据包id不为顺序表示存在问题，返回false，替换该session
     fn unpacket_handshake_response(&mut self, cur: &mut Cursor<&[u8]>) -> std::result::Result<(), Box<dyn Error>>{
-        println!("handshake_response: {:?}", self);
         let seq_id = cur.read_u8()?;
+        println!("{:?}, {:?}", seq_id, self.seq_id);
         if seq_id == self.seq_id + 1{
             cur.seek(io::SeekFrom::Current(32))?;
             let mut user_name_packet: Vec<u8> = vec![];

@@ -88,7 +88,6 @@ fn main() {
             let mut cap = Capture::from_device(device).unwrap()
                 .promisc(true)
                 .snaplen(65535).open().unwrap();
-            let mut fs = cap.savefile("aa.pcap").unwrap();
             'inner: while let Ok(packet) = cap.next() {
                 if packet.header.len < 73{
                     continue 'inner;
@@ -102,10 +101,6 @@ fn main() {
                 }
                 if host_info.check_port(&conf.port){
                     host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
-//                    fs.write(&packet);
-//                    println!("packet_header: {:?}, src:{:?}:{}, des: {:?}:{}",packet.header, host_info.source.format_ip(), host_info.source_port, host_info.destination.format_ip(), host_info.destination_port);
-//                    cur.seek(io::SeekFrom::Current(21)).unwrap();
-//                    println!("code:{}", cur.read_u8().unwrap());
                 }
             }
         }
