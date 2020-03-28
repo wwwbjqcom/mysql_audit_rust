@@ -96,7 +96,8 @@ fn main() {
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
                 if host_info.check_port(&conf.port){
-                    host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+                    //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+                    println!("{:?}", host_info);
                 }
             }
         }
