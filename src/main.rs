@@ -1,4 +1,4 @@
-use pcap::{Device, Capture};
+use pcap::{Device, Capture, Packet};
 use structopt::StructOpt;
 mod protocol;
 mod opacket;
@@ -90,13 +90,14 @@ fn main() {
                 .snaplen(65535).open().unwrap();
             let mut fs = cap.savefile("aa.pcap").unwrap();
             'inner: while let Ok(packet) = cap.next() {
-                if packet.header.len < 73{
+                if !check_ack_syn(&mut cur){
                     continue 'inner;
                 }
                 let mut cur = Cursor::new(packet.data);
                 //let a= packet.header.ts.tv_sec;
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
+
                 if host_info.check_port(&conf.port){
                     //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                     fs.write(&packet);
@@ -106,6 +107,18 @@ fn main() {
                 }
             }
         }
+    }
+}
+
+///
+/// 判断协议类型
+fn check_ack_syn(cur: &mut Cursor<&[u8]>) -> bool{
+    cur.seek(io::SeekFrom::Current(9)).unwrap();
+    let flags = cur.read_u8().unwrap();
+    match flags{
+        0x12 => false,
+        0x02 => false,
+        _ => true,
     }
 }
 
