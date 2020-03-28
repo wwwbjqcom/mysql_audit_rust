@@ -79,16 +79,16 @@ impl StreamType{
                 match all_session.aluino.get(session_key){
                     Some(session) => {
                         let mut session = session.clone();
-                        if !session.connection_pre{
-                            let mut new_session = session.replace(host_info, cur, &StreamType::Request)?;
-                            new_session.session_unpacket(cur, &StreamType::Request, host_info)?;
-                            new_session.insert(all_session, session_key)?;
-                        }else {
+                        if session.connection_pre{
+                            println!("aaaaa");
                             session.unpacket_handshake_response(cur)?;
                             //let new_session = session.replace(host_info, cur, &StreamType::Request)?;
                             session.insert(all_session, session_key)?;
+                        }else{
+                            let mut new_session = session.replace(host_info, cur, &StreamType::Request)?;
+                            new_session.session_unpacket(cur, &StreamType::Request, host_info)?;
+                            new_session.insert(all_session, session_key)?;
                         }
-
                         return Ok(());
                     }
                     None => {
