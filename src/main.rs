@@ -93,6 +93,7 @@ fn main() {
                 let mut cur = Cursor::new(packet.data);
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
+                println!("{:?}", packet.header);
                 if !check_ack_syn(&mut cur){
                     continue 'inner;
                 }
