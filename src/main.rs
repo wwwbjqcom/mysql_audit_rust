@@ -97,16 +97,15 @@ fn main() {
                 let mut cur = Cursor::new(packet.data);
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
-                println!("{:?}", packet.header);
                 if !check_ack_syn(&mut cur){
                     continue 'inner;
                 }
                 if host_info.check_port(&conf.port){
-                    //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
-                    fs.write(&packet);
-                    println!("packet_header: {:?}, src:{:?}:{}, des: {:?}:{}",packet.header, host_info.source.format_ip(), host_info.source_port, host_info.destination.format_ip(), host_info.destination_port);
-                    cur.seek(io::SeekFrom::Current(21)).unwrap();
-                    println!("code:{}", cur.read_u8().unwrap());
+                    host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
+//                    fs.write(&packet);
+//                    println!("packet_header: {:?}, src:{:?}:{}, des: {:?}:{}",packet.header, host_info.source.format_ip(), host_info.source_port, host_info.destination.format_ip(), host_info.destination_port);
+//                    cur.seek(io::SeekFrom::Current(21)).unwrap();
+//                    println!("code:{}", cur.read_u8().unwrap());
                 }
             }
         }

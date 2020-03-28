@@ -49,7 +49,7 @@ pub enum StreamType{
 }
 impl StreamType{
     pub fn streamtype_unpacket(&self, all_session: &mut AllSessionInfo, session_key: &String, cur: &mut Cursor<&[u8]>, host_info: &HostInfo, conf: &Config) -> std::result::Result<(), Box<dyn Error>>{
-        cur.seek(io::SeekFrom::Current(31))?;   //跳过网络层协议包内容及mysql协议前3字节payload的部分
+        cur.seek(io::SeekFrom::Current(21))?;   //跳过网络层协议包内容及mysql协议前3字节payload的部分
         match self{
             StreamType::Response => {
                 //响应包
@@ -333,7 +333,7 @@ impl SessionInfo{
     /// 操作client创建链接时回的handshake包， 从中获取user_name
     /// 如果数据包id不为顺序表示存在问题，返回false，替换该session
     fn unpacket_handshake_response(&mut self, cur: &mut Cursor<&[u8]>) -> std::result::Result<(), Box<dyn Error>>{
-        println!("{:?}", self);
+        println!("handshake_response: {:?}", self);
         let seq_id = cur.read_u8()?;
         if seq_id == self.seq_id + 1{
             cur.seek(io::SeekFrom::Current(32))?;
