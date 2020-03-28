@@ -90,10 +90,6 @@ fn main() {
                 .snaplen(65535).open().unwrap();
             let mut fs = cap.savefile("aa.pcap").unwrap();
             'inner: while let Ok(packet) = cap.next() {
-                if packet.header.len <= 66{
-                    continue 'inner;
-                }
-
                 let mut cur = Cursor::new(packet.data);
                 let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
@@ -104,7 +100,7 @@ fn main() {
                     //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                     fs.write(&packet);
                     println!("packet_header: {:?}, src:{:?}:{}, des: {:?}:{}",packet.header, host_info.source.format_ip(), host_info.source_port, host_info.destination.format_ip(), host_info.destination_port);
-                    cur.seek(io::SeekFrom::Current(31)).unwrap();
+                    cur.seek(io::SeekFrom::Current(18)).unwrap();
                     println!("code:{}", cur.read_u8().unwrap());
                 }
             }
