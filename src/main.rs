@@ -90,14 +90,12 @@ fn main() {
                 .snaplen(65535).open().unwrap();
             let mut fs = cap.savefile("aa.pcap").unwrap();
             'inner: while let Ok(packet) = cap.next() {
+                let mut cur = Cursor::new(packet.data);
+                let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
+                let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
                 if !check_ack_syn(&mut cur){
                     continue 'inner;
                 }
-                let mut cur = Cursor::new(packet.data);
-                //let a= packet.header.ts.tv_sec;
-                let ts = opacket::UnixTime::new(&packet.header.ts).unwrap();
-                let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
-
                 if host_info.check_port(&conf.port){
                     //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                     fs.write(&packet);
