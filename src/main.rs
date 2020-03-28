@@ -100,6 +100,7 @@ fn main() {
                     continue 'inner;
                 }
                 if host_info.check_port(&conf.port){
+                    println!("{:?}", &all_session_info);
                     host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
                 }
             }
