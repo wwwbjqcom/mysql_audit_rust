@@ -67,6 +67,10 @@ impl StreamType{
                             //如果为连接建立， 需要多次来回，在这不删除，直到成功或失败
                             if !session.connection_pre{
                                 all_session.remove(session_key);
+                            }else {
+                                if session.seq_id != 0 {
+                                    all_session.remove(session_key);
+                                }
                             }
                         }
                         _ =>{
