@@ -77,6 +77,9 @@ impl ServerProtocl{
         see: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset.html
 
         */
+        if session_info.connection_pre{
+            return;
+        }
         session_info.server_response = ServerProtocl::TextResult;
         session_info.end_time = host_info.ts.clone();
         println!("TextResult");
