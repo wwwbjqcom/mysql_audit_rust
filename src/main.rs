@@ -90,7 +90,7 @@ fn main() {
                 .snaplen(65535).open().unwrap();
             let mut fs = cap.savefile("aa.pcap").unwrap();
             'inner: while let Ok(packet) = cap.next() {
-                if packet.header.len <= 74{
+                if packet.header.len < 73{
                     continue 'inner;
                 }
                 let mut cur = Cursor::new(packet.data);
