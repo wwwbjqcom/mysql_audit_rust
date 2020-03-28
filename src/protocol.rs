@@ -79,6 +79,7 @@ impl ServerProtocl{
         */
         session_info.server_response = ServerProtocl::TextResult;
         session_info.end_time = host_info.ts.clone();
+        println!("TextResult");
         session_info.out_info();
     }
 
@@ -97,6 +98,7 @@ impl ServerProtocl{
         session_info.server_response = ServerProtocl::EOFPacket;
         session_info.end_time = host_info.ts.clone();
         session_info.connection_pre = false;
+        println!("EOFPacket");
         session_info.out_info();
     }
 
@@ -124,6 +126,7 @@ impl ServerProtocl{
         session_info.server_response = ServerProtocl::ERRpacket;
         session_info.end_time = host_info.ts.clone();
         session_info.connection_pre = false;
+        println!("ERRpacket");
         session_info.out_info();
         Ok(())
     }
@@ -146,6 +149,7 @@ impl ServerProtocl{
         session_info.server_response = ServerProtocl::OKPacket;
         session_info.end_time = host_info.ts.clone();
         session_info.connection_pre = false;
+        println!("OKPacket");
         session_info.out_info();
     }
 }
@@ -255,6 +259,7 @@ impl ClientProtocol{
         */
         session_info.execute_sql = String::from("close connection");
         session_info.client_request = ClientProtocol::ComQuit;
+        println!("ComQuit");
         session_info.out_info();
     }
 
@@ -272,6 +277,7 @@ impl ClientProtocol{
         */
         session_info.execute_sql = String::from("kill connection");
         session_info.client_request = ClientProtocol::ComProcessKill;
+        println!("ComProcessKill");
         session_info.out_info();
     }
 
