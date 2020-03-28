@@ -98,7 +98,7 @@ fn main() {
                 let mut host_info = opacket::HostInfo::new(&mut cur, &ts);
                 if host_info.check_port(&conf.port){
                     //host_info.check_request_respons(&conf, &mut all_session_info, &mut cur).unwrap();
-                    println!("{:?}", host_info);
+                    println!("packet_header: {:?}, src:{:?}:{}, des: {:?}:{}",packet.header, host_info.source.format_ip(), host_info.source_port, host_info.destination.format_ip(), host_info.destination_port);
                     cur.seek(io::SeekFrom::Current(31)).unwrap();
                     println!("code:{}", cur.read_u8().unwrap());
                 }
