@@ -7,7 +7,7 @@ use std::error::Error;
 use std::io::{Cursor, Seek, Read};
 use byteorder::{ReadBytesExt, BigEndian};
 use std::io;
-use crate::Config;
+use crate::{Config, Tell};
 use crate::session;
 use crate::session::{SessionInfo, SessionHostInfo};
 use std::convert::TryInto;
@@ -40,7 +40,7 @@ pub struct Ip{
     pub ip_four: u8
 }
 impl Ip{
-    pub fn new(cur: &mut Cursor<&[u8]>) -> Ip{
+    pub fn new(cur: &mut Cursor<Vec<u8>>) -> Ip{
         let ip_first = cur.read_u8().unwrap();
         let ip_two = cur.read_u8().unwrap();
         let ip_three = cur.read_u8().unwrap();
@@ -112,7 +112,7 @@ impl StreamPacket{
         let ts = UnixTime::new(&packet.header.ts)?;
         let len= packet.header.len;
 
-        let mut cur = Cursor::new(packet.data);
+        let mut cur = Cursor::new(packet.data.to_vec());
         cur.seek(io::SeekFrom::Current(26)).unwrap();
         let source = Ip::new(&mut cur);
         let destination = Ip::new(&mut cur);
@@ -121,13 +121,10 @@ impl StreamPacket{
 
         cur.seek(io::SeekFrom::Current(9)).unwrap();
         let packet_flag = cur.read_u8().unwrap();
-
         cur.seek(io::SeekFrom::Current(18))?;
-        let mut packet_data: Vec<u8> = vec![];
-        cur.read_to_end(packet_data.as_mut())?;
-        let data_cur = Cursor::new(packet_data);
+        println!("{:?}", cur.tell());
         Ok(StreamPacket{
-            data_cur,
+            data_cur: cur,
             packet_flag,
             ts,
             len,
