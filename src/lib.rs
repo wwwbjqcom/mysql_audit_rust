@@ -99,7 +99,7 @@ pub fn op_run() -> std::result::Result<(), Box<dyn Error>> {
                     continue 'inner;
                 }
                 my_packet.get_mysql_protocol_header()?;                                             // 获取mysql协议header部分
-                println!("{?}",&my_packet);
+                println!("{:?}",&my_packet);
                 if my_packet.check_port(&conf){                                                     // 判断数据流向端口是否为给定的端口
                     let session_key = my_packet.set_stream_type(&conf)?;
                     my_packet.op_session_info(&session_key, &mut all_session_info)?;
