@@ -303,7 +303,7 @@ impl MysqlProtocol{
 
 impl MysqlProtocolHeader{
     pub fn new(stream_packet: &mut StreamPacket) -> Result<MysqlProtocolHeader, Box<dyn Error>>{
-        let payload = stream_packet.data_cur.read_u24()?;
+        let payload = stream_packet.data_cur.read_u24::<LittleEndian>()?;
         let seq_id = stream_packet.data_cur.read_u8()?;
         let protocol_type = MysqlProtocol::new(stream_packet)?;
         Ok(MysqlProtocolHeader{
