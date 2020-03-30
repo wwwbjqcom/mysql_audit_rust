@@ -107,7 +107,7 @@ impl SessionInfo{
     /// 如果数据包id不为顺序表示存在问题，返回false，替换该session
     pub fn unpacket_handshake_response(&mut self, stream_packet: &mut StreamPacket) -> std::result::Result<(), Box<dyn Error>>{
         if stream_packet.protocol_header.seq_id == self.seq_id + 1{
-            stream_packet.data_cur.seek(io::SeekFrom::Current(32))?;
+            stream_packet.data_cur.seek(io::SeekFrom::Current(31))?;
             let mut user_name_packet: Vec<u8> = vec![];
             loop {
                 let a = stream_packet.data_cur.read_u8()?;
