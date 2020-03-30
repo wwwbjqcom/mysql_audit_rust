@@ -85,6 +85,7 @@ pub enum MysqlProtocol{
 
 ///
 /// 记录mysql协议包头部分及该包类型
+/#[derive(Debug, Clone)]
 pub struct  MysqlProtocolHeader{
     pub payload: u32,
     pub seq_id: u8,
