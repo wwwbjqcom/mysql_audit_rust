@@ -109,7 +109,7 @@ impl SessionInfo{
     pub fn unpacket_handshake_response(&mut self, stream_packet: &mut StreamPacket) -> std::result::Result<(), Box<dyn Error>>{
         if stream_packet.protocol_header.seq_id == self.seq_id + 1{
             stream_packet.data_cur.seek(io::SeekFrom::Current(31))?;
-            println!("{}", stream_packet.data_cur.tell()?);
+            println!("{}, {}", stream_packet.data_cur.tell()?, stream_packet.protocol_header.payload);
             let mut user_name_packet: Vec<u8> = vec![];
             loop {
                 let a = stream_packet.data_cur.read_u8()?;
