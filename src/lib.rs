@@ -105,10 +105,10 @@ pub fn op_run() -> std::result::Result<(), Box<dyn Error>> {
                 my_packet.get_mysql_protocol_header()?;                                             // 获取mysql协议header部分
                 //println!("{:?}",&my_packet.protocol_header);
                 if my_packet.check_port(&conf){                                                     // 判断数据流向端口是否为给定的端口
-                    println!("{:?}, tell:{}, len:{}", my_packet.protocol_header, my_packet.data_cur.tell().unwrap(), my_packet.len);
+                    //println!("{:?}, tell:{}, len:{}", my_packet.protocol_header, my_packet.data_cur.tell().unwrap(), my_packet.len);
                     sfile.write(&packet);
                     let session_key = my_packet.set_stream_type(&conf)?;
-                    //my_packet.op_session_info(&session_key, &mut all_session_info)?;
+                    my_packet.op_session_info(&session_key, &mut all_session_info)?;
                 }
             }
         }
