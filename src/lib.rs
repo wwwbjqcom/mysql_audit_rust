@@ -116,9 +116,10 @@ pub fn op_run() -> std::result::Result<(), Box<dyn Error>> {
 /// 判断协议类型
 fn check_ack_syn(my_packet: &packet::StreamPacket) -> bool{
     match my_packet.packet_flag{
-        0x12 => false,
-        0x02 => false,
-        _ => true,
+        0x18 => true,
+//        0x02 => false,
+//        0x12 => false,
+        _ => false,
     }
 }
 
