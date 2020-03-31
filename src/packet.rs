@@ -228,8 +228,11 @@ impl StreamPacket{
                         let mut local_session = v.clone();
                         if v.connection_pre{
                             // 准备创建连接
-                            local_session.unpacket_handshake_response(self)?;
-                            local_session.insert(all_session, session_key)?;
+                            if !local_session.unpacket_handshake_response(self)?{
+                                all_session.remove(session_key);
+                            }else {
+                                local_session.insert(all_session, session_key)?;
+                            }
                         }else {
                             local_session.session_unpacket(self, session_key, all_session)?;
                         }

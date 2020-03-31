@@ -106,10 +106,12 @@ impl SessionInfo{
     ///
     /// 操作client创建链接时回的handshake包， 从中获取user_name
     /// 如果数据包id不为顺序表示存在问题，返回false，替换该session
-    pub fn unpacket_handshake_response(&mut self, stream_packet: &mut StreamPacket) -> std::result::Result<(), Box<dyn Error>>{
+    pub fn unpacket_handshake_response(&mut self, stream_packet: &mut StreamPacket) -> std::result::Result<bool, Box<dyn Error>>{
+        if stream_packet.len <= 102{
+            return Ok(false);
+        }
         if stream_packet.protocol_header.seq_id == self.seq_id + 1{
             stream_packet.data_cur.seek(io::SeekFrom::Current(31))?;
-            println!("{}, {}, {}", stream_packet.data_cur.tell()?, stream_packet.protocol_header.payload, stream_packet.len);
             let mut user_name_packet: Vec<u8> = vec![];
             loop {
                 let a = stream_packet.data_cur.read_u8()?;
@@ -123,7 +125,7 @@ impl SessionInfo{
             self.user_name = user_name.parse()?;
             self.create_conn_auth = true;
         }
-        Ok(())
+        Ok(true)
     }
 
     pub fn insert(&self, all_session_info: &mut AllSessionInfo, session_key: &String) -> std::result::Result<(), Box<dyn Error>> {
