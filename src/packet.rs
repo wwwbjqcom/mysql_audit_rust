@@ -122,7 +122,6 @@ impl StreamPacket{
         cur.seek(io::SeekFrom::Current(9)).unwrap();
         let packet_flag = cur.read_u8().unwrap();
         cur.seek(io::SeekFrom::Current(18))?;
-
         Ok(StreamPacket{
             data_cur: cur,
             packet_flag,
