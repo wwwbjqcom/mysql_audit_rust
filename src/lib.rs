@@ -111,7 +111,7 @@ pub fn op_run() -> std::result::Result<(), Box<dyn Error>> {
                     my_packet.get_mysql_protocol_header()?;                                             // 获取mysql协议header部分
                     println!("{:?}, {:?}, {:?}", my_packet.session_host_info, my_packet.s_type, my_packet.protocol_header);
                     println!("{:?}", all_session_info);
-                    my_packet.op_session_info(&session_key, &mut all_session_info)?;
+                    //my_packet.op_session_info(&session_key, &mut all_session_info)?;
                 }
             }
         }
