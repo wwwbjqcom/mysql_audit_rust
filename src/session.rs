@@ -11,6 +11,7 @@ use crate::packet::UnixTime;
 use std::collections::HashMap;
 use std::error::Error;
 use std::str::from_utf8;
+use crate::Tell;
 
 ///
 /// 记录session ip端口信息
@@ -108,6 +109,7 @@ impl SessionInfo{
     pub fn unpacket_handshake_response(&mut self, stream_packet: &mut StreamPacket) -> std::result::Result<(), Box<dyn Error>>{
         if stream_packet.protocol_header.seq_id == self.seq_id + 1{
             stream_packet.data_cur.seek(io::SeekFrom::Current(31))?;
+            println!("{}", stream_packet.data_cur.tell()?);
             let mut user_name_packet: Vec<u8> = vec![];
             loop {
                 let a = stream_packet.data_cur.read_u8()?;
