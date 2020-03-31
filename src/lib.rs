@@ -99,10 +99,11 @@ pub fn op_run() -> std::result::Result<(), Box<dyn Error>> {
                 if !check_ack_syn(&my_packet){                                                      // 根据flag头再次判断是否为ack/syc包
                     continue 'inner;
                 }
-                println!("{}, {}, {}", my_packet.packet_flag, my_packet.len, my_packet.data_cur.tell().unwrap());
+
                 my_packet.get_mysql_protocol_header()?;                                             // 获取mysql协议header部分
                 //println!("{:?}",&my_packet.protocol_header);
                 if my_packet.check_port(&conf){                                                     // 判断数据流向端口是否为给定的端口
+                    println!("{:?}, {}", my_packet.protocol_header, my_packet.data_cur.tell().unwrap());
                     let session_key = my_packet.set_stream_type(&conf)?;
                     //my_packet.op_session_info(&session_key, &mut all_session_info)?;
                 }
