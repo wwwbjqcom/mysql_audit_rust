@@ -13,20 +13,24 @@ use crate::session::{SessionHostInfo, SessionInfo};
 impl MysqlProtocol{
     pub fn new(stream_packet: &mut StreamPacket) -> Result<MysqlProtocol, Box<dyn Error>>{
         let code = stream_packet.data_cur.read_u8()?;
-        match code{
-            0x00 => Ok(MysqlProtocol::OKPacket),
-            0xfe => Ok(MysqlProtocol::EOFPacket),
-            0xff => Ok(MysqlProtocol::ERRpacket),
-            0x0a => Ok(MysqlProtocol::HandshakePacket),
-            0x03 => Ok(MysqlProtocol::ComQuery),
-            0x01 => Ok(MysqlProtocol::ComQuit),
-            0x02 => Ok(MysqlProtocol::ComInitDb),
-            0x0C => Ok(MysqlProtocol::ComProcessKill),
-            0x16 => Ok(MysqlProtocol::ComStmtPrepare),
-            _ => {
-                match stream_packet.s_type{
-                    StreamType::Response => Ok(MysqlProtocol::TextResult),
-                    StreamType::Request => Ok(MysqlProtocol::Null),
+        match stream_packet.s_type{
+            StreamType::Response => {
+                match code{
+                    0x00 => Ok(MysqlProtocol::OKPacket),
+                    0xfe => Ok(MysqlProtocol::EOFPacket),
+                    0xff => Ok(MysqlProtocol::ERRpacket),
+                    0x0a => Ok(MysqlProtocol::HandshakePacket),
+                    _ => Ok(MysqlProtocol::TextResult)
+                }
+            }
+            StreamType::Request => {
+                match code{
+                    0x03 => Ok(MysqlProtocol::ComQuery),
+                    0x01 => Ok(MysqlProtocol::ComQuit),
+                    0x02 => Ok(MysqlProtocol::ComInitDb),
+                    0x0C => Ok(MysqlProtocol::ComProcessKill),
+                    0x16 => Ok(MysqlProtocol::ComStmtPrepare),
+                    _ => Ok(MysqlProtocol::Null)
                 }
             }
         }
