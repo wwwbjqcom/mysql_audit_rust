@@ -108,7 +108,8 @@ pub fn op_run() -> std::result::Result<(), Box<dyn Error>> {
                     //println!("{:?}, tell:{}, len:{}", my_packet.protocol_header, my_packet.data_cur.tell().unwrap(), my_packet.len);
                     sfile.write(&packet);
                     let session_key = my_packet.set_stream_type(&conf)?;
-                    my_packet.op_session_info(&session_key, &mut all_session_info)?;
+                    println!("{:?}, {:?}, {:?}", my_packet.session_host_info, my_packet.s_type, my_packet.protocol_header);
+                    //my_packet.op_session_info(&session_key, &mut all_session_info)?;
                 }
             }
         }
